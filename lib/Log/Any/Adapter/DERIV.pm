@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 # AUTHORITY
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 use feature qw(state);
 use parent qw(Log::Any::Adapter::Coderef);
@@ -153,7 +153,7 @@ my %num_to_name = map {$_ => $methods[$_]} 0..$#methods;
 # the default anyway.
 # Rather than trying to deal with that, we just provide our own default:
 {
-    no warnings 'redefine';
+    no warnings 'redefine'; ## no critic (ProhibitNoWarnings)
 
     # We expect this to be loaded, but be explicit just in case - we'll be overriding
     # one of the methods, so let's at least make sure it exists first
@@ -177,13 +177,13 @@ my %num_to_name = map {$_ => $methods[$_]} 0..$#methods;
         # is issued from here, which isn't very helpful. Doing something
         # clever would be expensive, so instead we just disable warnings for
         # the final line of this subroutine.
-        no warnings;
+        no warnings; ## no critic (ProhibitNoWarnings)
         return sprintf($format, @new_params);
     };
 }
 
 # Upgrade any `warn ...` lines to send through Log::Any.
-$SIG{__WARN__} = sub {
+$SIG{__WARN__} = sub { ## no critic (RequireLocalizedPunctuationVars)
     # We don't expect anything called from here to raise further warnings, but
     # let's be safe and try to avoid any risk of recursion
     local $SIG{__WARN__} = undef;
@@ -248,7 +248,7 @@ sub apply_filehandle_utf8 {
     # so we make this check quite lax and skip binmode if there's anything even slightly
     # utf-flavoured in the mix.
     $fh->binmode(':encoding(UTF-8)')
-        unless grep /utf/i, PerlIO::get_layers($fh, output => 1);
+        unless grep {/utf/i} PerlIO::get_layers($fh, output => 1);
     $fh->autoflush(1);
 }
 
@@ -459,7 +459,7 @@ sub _collapse_future_stack {
     my $previous_is_future;
 
     for my $frame ($stack->@*) {
-        if ($frame->{package} eq 'Future') {
+        if ($frame->{package} eq 'Future' || $frame->{package} eq 'Future::PP') {
             next if ($previous_is_future);
             push @new_stack, $frame;
             $previous_is_future = 1;
@@ -490,7 +490,7 @@ Returns boolean
 sub _fh_is_tty {
     my $fh = shift;
 
-    return -t $fh;
+    return -t $fh; ## no critic (ProhibitInteractiveTest)
 }
 
 =head2 _in_container

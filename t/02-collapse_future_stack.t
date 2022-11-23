@@ -76,7 +76,7 @@ subtest 'test collapse from message' => sub {
     my $message        = $get_message->($f1);
     my $expected_stack = [
         map { ; { package => $_ } } (
-            "Future",        "main",
+            "Future::PP",        "main",
             "main",          "Test::Builder",
             "Test::Builder", "Test::More",
             "main"
@@ -92,10 +92,11 @@ subtest 'test collapse from message' => sub {
     my $f4 = $f2->then_done->then_done->then(
         sub { $log->debug("this is a debug message"); Future->done } );
     $message        = $get_message->($f1);
+
     $expected_stack = [
         map { ; { package => $_ } } (
-            "Future",        "main",
-            "Future",        "main",
+            "Future::PP",        "main",
+            "Future::PP",        "main",
             "main",          "Test::Builder",
             "Test::Builder", "Test::More",
             "main"
