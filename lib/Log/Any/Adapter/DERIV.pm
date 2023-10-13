@@ -320,6 +320,8 @@ sub format_line {
             $ts,
             qw(bright_blue)
         ),
+        colored("[$data->{cid}]", qw(bright_blue)),
+
         colored(
             $level,
             @colours
@@ -353,6 +355,8 @@ Add format and add color code using C<format_line> and writes the log entry
 sub log_entry {
     my ($self, $data) = @_;
     $data = $self->_process_data($data);
+    $data->{cid} = $self->{cid};
+
     my $json_data;
     my %text_data = ();
     my $get_json  = sub { $json_data //= encode_json_text($data) . "\n"; return $json_data; };
@@ -620,6 +624,15 @@ sub level {
 }
 
 1;
+
+sub set_context {
+    my ($self, $cid) = @_;
+    $self->{cid} = $cid;
+}
+sub clear_context {
+    my ($self) = @_;
+    delete $self->{cid};
+}
 
 =head1 AUTHOR
 
